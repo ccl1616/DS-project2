@@ -11,7 +11,6 @@ using namespace std;
 vector <vector<bool> > map; //for input
 vector <vector<bool> > map_clean; //for now situation
 vector <vector<int> > vis;
-int def_x,def_y;
 // 上下左右
 int dx[4] = {-1,1,0,0};
 int dy[4] = {0,0,-1,1};
@@ -23,22 +22,21 @@ int total;
 int nowstep;
 
 struct spot{
-    // search difference between int & short
-    int x;
-    int y;
-    //int cost;
+    short x;
+    short y;
     spot(){}
     spot(int a,int b):x(a),y(b){}
-    //spot(int a,int b,int c):x(a),y(b),cost(c){}
 };
-void BFS(int x, int y,int cost, vector <vector<int> > &vis);
 
+// main functions
+void BFS(int x, int y,int cost, vector <vector<int> > &vis);
+void combine(int x, int y, vector<spot> &temp); //path + move + charge
 void path(int x, int y, vector<spot> &temp); //R to spot
 void _path(int &x, int &y, int cost);
 void move(int &x, int &y, vector<spot> &temp); //move around
 void charge(int &x, int &y, vector<spot> &temp); //go home
-void combine(int x, int y, vector<spot> &temp);
-void flush(vector<spot> &temp);
+void flush(vector<spot> &temp); //flush data into temp file
+// minor functions
 void debug_i(vector <vector<int> > a); //debugger for int
 void debug_b(vector <vector<bool> > a); //debugger for bool
 bool outbound(int x, int y); //true if it's outbound
@@ -85,6 +83,10 @@ int main(int argc, const char * argv[])
     // input and initialize
     FILE* input = freopen(argv[1],"r",stdin);
     scanf("%d %d %d",&m,&n,&e);
+    if(m > 1000 || n > 1000){
+        cout << "invalid map size\n";
+        return 0;
+    }
     vis.resize(m);
     map.resize(m);
     map_clean.resize(m);
@@ -130,17 +132,8 @@ int main(int argc, const char * argv[])
     // output to final
     FILE* output = freopen("final.path","w",stdout);
     tempo = freopen("temp.txt","r",stdin);
-
     cout << "total: " << total << endl;
     /*
-    cout << "map\n";
-    debug_b(map);
-    cout << "map_clean\n";
-    debug_b(map_clean);
-    cout << "vis\n";
-    debug_i(vis);
-
-    
     int a = 0;
     int b = 0; 
     for(int i = 0; i < total; i ++){
@@ -153,6 +146,14 @@ int main(int argc, const char * argv[])
     clock_t stop_clock = clock();
     double duration_clock = ((double) (stop_clock-start_clock))/ CLOCKS_PER_SEC;
     cout << "time: " << duration  << "," << duration_clock << endl;
+
+    cout << "map\n";
+    debug_b(map);
+    cout << "map_clean\n";
+    debug_b(map_clean);
+    cout << "vis\n";
+    debug_i(vis);
+
     fclose(tempo);
     fclose(output);
     return 0;
