@@ -103,6 +103,10 @@ int main(int argc, const char * argv[])
                 map[i][j] = true;
             }
             else if(temp == '1') map[i][j] = true;
+            else if(temp != '0') {
+                cout << "invalid test case with character: " << temp << endl;
+                return 0;
+            }
             else map[i][j] = false;
 
             map_clean[i][j] = map[i][j];
@@ -122,52 +126,45 @@ int main(int argc, const char * argv[])
             }
         }
     }
-    fclose(tempo);
 
-    // output level
+    // output to final
     FILE* output = freopen("final.path","w",stdout);
-    time_t stop = time(NULL);
-    double duration = (double) difftime(stop,start);
-    clock_t stop_clock = clock();
-    double duration_clock = ((double) (stop_clock-start_clock))/ CLOCKS_PER_SEC;
-    cout << "time: " << duration  << "," << duration_clock << endl;
+    tempo = freopen("temp.txt","r",stdin);
+
     cout << "total: " << total << endl;
-    
+    /*
     cout << "map\n";
     debug_b(map);
     cout << "map_clean\n";
     debug_b(map_clean);
     cout << "vis\n";
     debug_i(vis);
-    fclose(output);
 
+    
+    int a = 0;
+    int b = 0; 
+    for(int i = 0; i < total; i ++){
+        fscanf(tempo,"%d %d",&a,&b);
+        fprintf(output,"%d %d\n",a,b);
+    }*/
+
+    time_t stop = time(NULL);
+    double duration = (double) difftime(stop,start);
+    clock_t stop_clock = clock();
+    double duration_clock = ((double) (stop_clock-start_clock))/ CLOCKS_PER_SEC;
+    cout << "time: " << duration  << "," << duration_clock << endl;
+    fclose(tempo);
+    fclose(output);
     return 0;
 }
 
-void debug_i(vector <vector<int> > a)
-{
-    for(int i = 0; i < m; i ++){
-        for(int j = 0; j < n; j ++){
-            if(a[i][j] == -1) cout << setw(3) << "-" << " ";
-            else cout << setw(3) << a[i][j] << " ";
-        }
-        cout << endl;
-    }
-}
-void debug_b(vector <vector<bool> > a)
-{
-    for(int i = 0; i < m; i ++){
-        for(int j = 0; j < n; j ++){
-            cout << setw(3) << a[i][j] << " ";
-        }
-        cout << endl;
-    }
-}
 void combine(int x, int y, vector<spot> &temp)
 {
+    //cout << "before path: " << x << " " << y << endl;
     path(x,y,temp);
     nowstep = vis[x][y];
     move(x,y,temp);
+    //cout << "after move: " << x << " " << y << endl;
     charge(x,y,temp);
     flush(temp);
 }
@@ -223,26 +220,23 @@ void move(int &x, int &y, vector<spot> &temp)
     //move around, start from x,y
     int tempx = x;
     int tempy = y;
-    while(nowstep+1 <= e/2){
+    while(nowstep < e){
         bool flag = false;
         for(int i = 0; i < 4; i ++){
             tempx = x + dirx[i];
             tempy = y + diry[i];
             if(outbound(tempx,tempy)) continue; 
-            if(!map_clean[tempx][tempy]){
+            if(!map_clean[tempx][tempy] && nowstep + vis[tempx][tempy] < e ){
+                x = tempx;
+                y = tempy;
+                map_clean[x][y] = true;
+                temp.push_back(spot(x,y));
+                nowstep++;
                 flag = true;
-                break; //break out of for loop
+                break;
             }
         }
-        if(!flag) {
-            //cout << "no move\n";
-            return;
-        }
-        x = tempx;
-        y = tempy;
-        map_clean[x][y] = true;
-        temp.push_back(spot(x,y));
-        nowstep ++;
+        if(!flag) return;
     }
 }
 void charge(int &x, int &y, vector<spot> &temp) 
@@ -251,10 +245,25 @@ void charge(int &x, int &y, vector<spot> &temp)
     int cost = vis[x][y];
     int tempx = x;
     int tempy = y;
+    bool flag;
     if(cost == 1) return;
     while(cost > 1){
         cost --;
-        //cout << x << "," << y << " " << cost << endl;
+        flag = false;
+        for(int i = 0; i < 4; i ++){
+            tempx = x + dirx[i];
+            tempy = y + diry[i];
+            if(outbound(tempx,tempy)) continue;
+            if(vis[tempx][tempy] == cost && !map_clean[tempx][tempy]) {
+                x = tempx;
+                y = tempy;
+                map_clean[x][y] = true;
+                temp.push_back(spot(x,y));
+                flag = true;
+                break;
+            }
+        }
+        if(flag == true) continue;
         for(int i = 0; i < 4; i ++){
             tempx = x + dirx[i];
             tempy = y + diry[i];
@@ -277,8 +286,29 @@ void flush(vector<spot> &temp)
     total += temp.size()+1;
     temp.clear();
 }
+
+// minor functions
 bool outbound(int x, int y)
 {
     if(x < 0 || y < 0 || x >= m || y >= n ) return true;
     else return false;
+}
+void debug_i(vector <vector<int> > a)
+{
+    for(int i = 0; i < m; i ++){
+        for(int j = 0; j < n; j ++){
+            if(a[i][j] == -1) cout << setw(3) << "-" << " ";
+            else cout << setw(3) << a[i][j] << " ";
+        }
+        cout << endl;
+    }
+}
+void debug_b(vector <vector<bool> > a)
+{
+    for(int i = 0; i < m; i ++){
+        for(int j = 0; j < n; j ++){
+            cout << setw(3) << a[i][j] << " ";
+        }
+        cout << endl;
+    }
 }
