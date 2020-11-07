@@ -42,46 +42,12 @@ void debug_i(vector <vector<int> > a); //debugger for int
 void debug_b(vector <vector<bool> > a); //debugger for bool
 bool outbound(int x, int y); //true if it's outbound
 
-void BFS(int x, int y,int cost, vector <vector<int> > &vis)
-{
-    // initialize
-    bool clean[m][n];
-    for(int i = 0; i < m; i ++){
-        for(int j = 0; j < n; j ++){
-            vis[i][j] = -1;
-            clean[i][j] = map[i][j];
-        }
-    }
-    // x,y for starting pos
-    queue<spot> q;
-    q.push(spot(x,y));
-    vis[x][y] = 0; //此點為起點
-
-    while(!q.empty()){
-        spot temp = q.front();
-        q.pop();
-        int x0 = temp.x;
-        int y0 = temp.y;
-
-        for(int i = 0; i < 4; i ++){
-            x0 = temp.x + dx[i];
-            y0 = temp.y + dy[i];
-            if(x0 >= 0 && y0 >= 0 && x0 < m && y0 < n && vis[x0][y0]== -1 && !clean[x0][y0]){
-                vis[x0][y0] = vis[temp.x][temp.y] +1;
-                clean[x0][y0] = 1;
-                q.push(spot(x0,y0));
-            }
-        }
-    }
-    return;
-}
-
 int main(int argc, const char * argv[])
 {
     time_t start = time(NULL);
     clock_t start_clock = clock();
 
-    // input and initialize
+    // initialize and input
     FILE* input = freopen(argv[1],"r",stdin);
     scanf("%d %d %d",&m,&n,&e);
     if(m > 1000 || n > 1000){
@@ -158,6 +124,38 @@ int main(int argc, const char * argv[])
     fclose(tempo);
     fclose(output);
     return 0;
+}
+void BFS(int x, int y,int cost, vector <vector<int> > &vis)
+{
+    // initialize
+    bool clean[m][n];
+    for(int i = 0; i < m; i ++){
+        for(int j = 0; j < n; j ++){
+            vis[i][j] = -1;
+            clean[i][j] = map[i][j];
+        }
+    }
+    // x,y for starting pos
+    queue<spot> q;
+    q.push(spot(x,y));
+    vis[x][y] = 0; //此點為起點
+
+    while(!q.empty()){
+        spot temp = q.front();
+        q.pop();
+        int x0 = temp.x;
+        int y0 = temp.y;
+        for(int i = 0; i < 4; i ++){
+            x0 = temp.x + dx[i];
+            y0 = temp.y + dy[i];
+            if(x0 >= 0 && y0 >= 0 && x0 < m && y0 < n && vis[x0][y0]== -1 && !clean[x0][y0]){
+                vis[x0][y0] = vis[temp.x][temp.y] +1;
+                clean[x0][y0] = 1;
+                q.push(spot(x0,y0));
+            }
+        }
+    }
+    return;
 }
 
 void combine(int x, int y, vector<spot> &temp)
