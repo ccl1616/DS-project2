@@ -36,6 +36,7 @@ void _path(int &x, int &y, int cost);
 void move(int &x, int &y, vector<spot> &temp); //move around
 void charge(int &x, int &y, vector<spot> &temp); //go home
 void flush(vector<spot> &temp); //flush data into temp file
+bool bounce(int &x, int &y, vector<spot> &temp);
 // minor functions
 void debug_i(vector <vector<int> > a); //debugger for int
 void debug_b(vector <vector<bool> > a); //debugger for bool
@@ -166,6 +167,10 @@ void combine(int x, int y, vector<spot> &temp)
     nowstep = vis[x][y];
     move(x,y,temp);
     //cout << "after move: " << x << " " << y << endl;
+    while(bounce(x,y,temp)){
+        move(x,y,temp);
+    }
+    //cout << "before charge: " << x << " " << y << endl;
     charge(x,y,temp);
     flush(temp);
 }
@@ -242,7 +247,7 @@ void move(int &x, int &y, vector<spot> &temp)
 }
 void charge(int &x, int &y, vector<spot> &temp) 
 {
-    //go home 隨便走回家  
+    //go home 遞減走回家  
     int cost = vis[x][y];
     int tempx = x;
     int tempy = y;
@@ -279,6 +284,30 @@ void charge(int &x, int &y, vector<spot> &temp)
         }
     }
 }
+
+bool bounce(int &x, int &y, vector<spot> &temp)
+{
+    // bounce return false if previous step is not vis-1, or if bounce will cause 電力不足以回家
+    int id = temp.size()-2;
+    int x_ = temp[id].x;
+    int y_ = temp[id].y;
+    if(vis[x_][y_] == vis[x][y]-1){
+        if(nowstep+1+vis[x_][y_] > e) {
+            cout << nowstep << " " << x << "," << y << " to " << x_ << "," << y_ << endl;
+            cout << vis[x_][y_] << " " << e << endl;
+            return false;
+        }
+        //cout << "bounce from: " << x << "," << y << " to " << x_ << "," << y_ << endl;
+        x = x_, y = y_;
+        temp.push_back(spot(x,y));
+        nowstep++;
+        return true;
+    }
+    //cout << "bounce false from: " << x << "," << y << " to " << x_ << "," << y_ << endl;
+    return false;
+}
+
+// minor functions
 void flush(vector<spot> &temp)
 {
     for(int i = 0; i < temp.size(); i ++) 
@@ -287,8 +316,6 @@ void flush(vector<spot> &temp)
     total += temp.size()+1;
     temp.clear();
 }
-
-// minor functions
 bool outbound(int x, int y)
 {
     if(x < 0 || y < 0 || x >= m || y >= n ) return true;
