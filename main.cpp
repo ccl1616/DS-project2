@@ -6,6 +6,7 @@
 #include <stack>
 #include <time.h>
 #include <iomanip>
+#include <algorithm>
 using namespace std;
 // my code
 vector <vector<bool> > map; //for input
@@ -17,6 +18,9 @@ int dy[4] = {0,0,-1,1};
 // 右左下上
 int dirx[4] = {0,0,1,-1};
 int diry[4] = {1,-1,0,0};
+// 下右上左
+int t_x[4] = {1,0,-1,0};
+int t_y[4] = {0,1,0,-1};
 int m,n,e,R_x,R_y;
 int total;
 int nowstep;
@@ -27,6 +31,18 @@ struct spot{
     spot(){}
     spot(int a,int b):x(a),y(b){}
 };
+// opt for option
+struct opt{
+    spot p;
+    int grade;
+    opt(){}
+    opt(int a,int b, int c):p( spot(a,b)),grade(c) {}
+};
+typedef pair<int, int> pii;
+bool compare(pii a, pii b)
+{
+	return a.second > b.second;
+}
 
 // main functions
 void BFS(int x, int y,int cost, vector <vector<int> > &vis);
@@ -37,6 +53,9 @@ void move(int &x, int &y, vector<spot> &temp); //move around
 void charge(int &x, int &y, vector<spot> &temp); //go home
 void flush(vector<spot> &temp); //flush data into temp file
 bool bounce(int &x, int &y, vector<spot> &temp); //bounce one step to a smaller place
+
+void _path_wall(int &x, int &y, int cost);
+int grading(int &x, int &y,int cost); //find a step that nearest to the nearest wall
 // minor functions
 void debug_i(vector <vector<int> > a); //debugger for int
 void debug_b(vector <vector<bool> > a); //debugger for bool
@@ -182,6 +201,7 @@ void path(int x, int y, vector<spot> &temp){
     while(cost > 1){
         cost--;
         _path(x,y,cost);
+        //_path_wall(x,y,cost);
         s.push(spot(x,y));
         map_clean[x][y] = true;
     }
@@ -195,9 +215,9 @@ void _path(int &x, int &y, int cost )
     // 下右上左
     int t_x[4] = {1,0,-1,0};
     int t_y[4] = {0,1,0,-1};
+    /*
     int tempx = x;
     int tempy = y;
-
     for(int i = 0; i < 4; i ++){
         tempx = x+t_x[i];
         tempy = y+t_y[i];
@@ -217,8 +237,56 @@ void _path(int &x, int &y, int cost )
             y = tempy;
             return;
         }
+    }*/
+    if( x+1<m && vis[x+1][y]==cost && !map_clean[x+1][y] ) x += 1;
+    else if( y+1<n && vis[x][y+1]==cost && !map_clean[x][y+1] ) y += 1;
+    else if( x-1>=0 && vis[x-1][y]==cost && !map_clean[x-1][y] ) x -= 1;
+    else if( y-1>=0 && vis[x][y-1]==cost && !map_clean[x][y-1] ) y -=1;
+    else if( x+1<m && vis[x+1][y]==cost ) x += 1;
+    else if( y+1<n && vis[x][y+1]==cost  ) y += 1;
+    else if( x-1>=0 && vis[x-1][y]==cost  ) x -= 1;
+    else if( y-1>=0 && vis[x][y-1]==cost  ) y -=1;
+    else {
+        cout << "impossible\n";
+        exit(1);
     }
 }
+void _path_wall(int &x, int &y, int cost )
+{
+    // 下右上左
+    int t_x[4] = {1,0,-1,0};
+    int t_y[4] = {0,1,0,-1};
+    int tempx = x;
+    int tempy = y;
+    pii arr[4];
+
+    for(int i = 0; i < 4; i ++){
+        tempx = x+t_x[i];
+        tempy = y+t_y[i];
+        if(outbound(tempx,tempy)) continue; 
+        if(vis[tempx][tempy] == cost){
+            arr[i].first = i;
+            arr[i].second = grading(tempx,tempy,cost-1);
+        }
+    }
+    sort(arr,arr+4,compare);
+    x += t_x[arr[0].first];
+    y += t_y[arr[0].first];
+}
+int grading(int &x, int &y,int cost)
+{
+    int grade = 0;
+    int tempx = x;
+    int tempy = y;
+    for(int i = 0; i < 4; i ++){
+        tempx = x + t_x[i];
+        tempy = y + t_y[i];
+        if(outbound(tempx,tempy)) continue; 
+        if(map_clean[tempx][tempy] == 1) grade ++;  //旁邊是牆壁的話是好的 因為希望貼著牆壁走
+    }
+    return grade;
+}
+
 void move(int &x, int &y, vector<spot> &temp) 
 {
     //move around, start from x,y
@@ -253,6 +321,7 @@ void charge(int &x, int &y, vector<spot> &temp)
     if(cost == 1) return;
     while(cost > 1){
         cost --;
+        /*
         flag = false;
         for(int i = 0; i < 4; i ++){
             tempx = x + dirx[i];
@@ -280,7 +349,22 @@ void charge(int &x, int &y, vector<spot> &temp)
                 temp.push_back(spot(x,y));
                 break;
             }
+        }*/
+        // 右左下上
+        if(y+1<n && vis[x][y+1]==cost && !map_clean[x][y+1] ) y ++;
+        else if(y-1>=0 && vis[x][y-1]==cost && !map_clean[x][y-1] ) y --;
+        else if(x+1<m && vis[x+1][y]==cost && !map_clean[x+1][y] ) x ++;
+        else if(x-1>=0 && vis[x-1][y]==cost && !map_clean[x-1][y] ) x --;
+        else if(y+1<n && vis[x][y+1]==cost ) y ++;
+        else if(y-1>=0 && vis[x][y-1]==cost ) y --;
+        else if(x+1<m && vis[x+1][y]==cost ) x ++;
+        else if(x-1>=0 && vis[x-1][y]==cost ) x --;
+        else{
+            cout << "impossible\n";
+            exit(1);
         }
+        map_clean[x][y] = true;
+        temp.push_back(spot(x,y));
     }
 }
 
