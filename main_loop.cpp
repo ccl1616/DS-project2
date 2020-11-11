@@ -32,17 +32,6 @@ struct spot{
     spot(int a,int b):x(a),y(b){}
 };
 // opt for option
-struct opt{
-    spot p;
-    int grade;
-    opt(){}
-    opt(int a,int b, int c):p( spot(a,b)),grade(c) {}
-};
-typedef pair<int, int> pii;
-bool compare(pii a, pii b)
-{
-	return a.second > b.second;
-}
 
 // main functions
 void BFS(int x, int y,int cost, vector <vector<int> > &vis);
@@ -54,17 +43,22 @@ void charge(int &x, int &y, vector<spot> &temp); //go home
 void flush(vector<spot> &temp); //flush data into temp file
 bool bounce(int &x, int &y, vector<spot> &temp); //bounce one step to a smaller place
 
-void _path_wall(int &x, int &y, int cost);
-int grading(int &x, int &y,int cost); //find a step that nearest to the nearest wall
 // minor functions
 void debug_i(vector <vector<int> > a); //debugger for int
 void debug_b(vector <vector<bool> > a); //debugger for bool
 bool outbound(int x, int y); //true if it's outbound
 
+time_t start;
+clock_t start_clock;
+time_t stop;
+double duration;
+clock_t stop_clock;
+double duration_clock;
+
 int main(int argc, const char * argv[])
 {
-    time_t start = time(NULL);
-    clock_t start_clock = clock();
+    start = time(NULL);
+    start_clock = clock();
 
     // initialize and input
     FILE* input = freopen(argv[1],"r",stdin);
@@ -109,7 +103,7 @@ int main(int argc, const char * argv[])
     cout << R_x << " " << R_y << endl;
     for(int i = 0; i < m; i ++){
         for(int j = 0; j < n; j ++){
-            if(!map_clean[i][j]){
+            while(!map_clean[i][j]){
                 combine(i,j,temp);
             }
         }
@@ -127,10 +121,10 @@ int main(int argc, const char * argv[])
         fprintf(output,"%d %d\n",a,b);
     }*/
 
-    time_t stop = time(NULL);
-    double duration = (double) difftime(stop,start);
-    clock_t stop_clock = clock();
-    double duration_clock = ((double) (stop_clock-start_clock))/ CLOCKS_PER_SEC;
+    stop = time(NULL);
+    duration = (double) difftime(stop,start);
+    stop_clock = clock();
+    duration_clock = ((double) (stop_clock-start_clock))/ CLOCKS_PER_SEC;
     cout << "time: " << duration  << "," << duration_clock << endl;
     /*
     cout << "map\n";
@@ -164,30 +158,39 @@ void BFS(int x, int y,int cost, vector <vector<int> > &vis)
         q.pop();
         int x0 = temp.x;
         int y0 = temp.y;
-        for(int i = 0; i < 4; i ++){
-            x0 = temp.x + dx[i];
-            y0 = temp.y + dy[i];
-            if(x0 >= 0 && y0 >= 0 && x0 < m && y0 < n && vis[x0][y0]== -1 && !clean[x0][y0]){
-                vis[x0][y0] = vis[temp.x][temp.y] +1;
-                clean[x0][y0] = 1;
-                q.push(spot(x0,y0));
-            }
+        if(x0-1>=0 && !clean[x0-1][y0]){
+            vis[x0-1][y0] = vis[x0][y0] +1;
+            clean[x0-1][y0] = 1;
+            q.push(spot(x0-1,y0));
         }
+        if(x0+1<m && !clean[x0+1][y0]){
+            vis[x0+1][y0] = vis[x0][y0] +1;
+            clean[x0+1][y0] = 1;
+            q.push(spot(x0+1,y0));
+        }
+        if(y0+1<n && !clean[x0][y0+1]){
+            vis[x0][y0+1] = vis[x0][y0] +1;
+            clean[x0][y0+1] = 1;
+            q.push(spot(x0,y0+1));
+        }
+        if(y0-1>=0 && !clean[x0][y0-1]){
+            vis[x0][y0-1] = vis[x0][y0] +1;
+            clean[x0][y0-1] = 1;
+            q.push(spot(x0,y0-1));
+        }
+
     }
     return;
 }
 
 void combine(int x, int y, vector<spot> &temp)
 {
-    //cout << "before path: " << x << " " << y << endl;
     path(x,y,temp);
     nowstep = vis[x][y];
     move(x,y,temp);
-    //cout << "after move: " << x << " " << y << endl;
     while(bounce(x,y,temp)){
         move(x,y,temp);
     }
-    //cout << "before charge: " << x << " " << y << endl;
     charge(x,y,temp);
     flush(temp);
 }
@@ -213,31 +216,6 @@ void path(int x, int y, vector<spot> &temp){
 void _path(int &x, int &y, int cost )
 {
     // 下右上左
-    int t_x[4] = {1,0,-1,0};
-    int t_y[4] = {0,1,0,-1};
-    /*
-    int tempx = x;
-    int tempy = y;
-    for(int i = 0; i < 4; i ++){
-        tempx = x+t_x[i];
-        tempy = y+t_y[i];
-        if(outbound(tempx,tempy)) continue; 
-        if(!map_clean[tempx][tempy] && vis[tempx][tempy] == cost){
-            x = tempx;
-            y = tempy;
-            return;
-        }
-    }
-    for(int i = 0; i < 4; i ++){
-        tempx = x+t_x[i];
-        tempy = y+t_y[i];
-        if(outbound(tempx,tempy)) continue; 
-        if(vis[tempx][tempy] == cost){
-            x = tempx;
-            y = tempy;
-            return;
-        }
-    }*/
     if( x+1<m && vis[x+1][y]==cost && !map_clean[x+1][y] ) x += 1;
     else if( y+1<n && vis[x][y+1]==cost && !map_clean[x][y+1] ) y += 1;
     else if( x-1>=0 && vis[x-1][y]==cost && !map_clean[x-1][y] ) x -= 1;
@@ -250,75 +228,19 @@ void _path(int &x, int &y, int cost )
         cout << "impossible\n";
         exit(1);
     }
+    
 }
-void _path_wall(int &x, int &y, int cost )
-{
-    // 下右上左
-    int t_x[4] = {1,0,-1,0};
-    int t_y[4] = {0,1,0,-1};
-    int tempx = x;
-    int tempy = y;
-    pii arr[4];
-
-    for(int i = 0; i < 4; i ++){
-        tempx = x+t_x[i];
-        tempy = y+t_y[i];
-        if(outbound(tempx,tempy)) continue; 
-        if(vis[tempx][tempy] == cost){
-            arr[i].first = i;
-            arr[i].second = grading(tempx,tempy,cost-1);
-        }
-    }
-    sort(arr,arr+4,compare);
-    x += t_x[arr[0].first];
-    y += t_y[arr[0].first];
-}
-int grading(int &x, int &y,int cost)
-{
-    int grade = 0;
-    int tempx = x;
-    int tempy = y;
-    for(int i = 0; i < 4; i ++){
-        tempx = x + t_x[i];
-        tempy = y + t_y[i];
-        if(outbound(tempx,tempy)) continue; 
-        if(map_clean[tempx][tempy] == 1) grade ++;  //旁邊是牆壁的話是好的 因為希望貼著牆壁走
-    }
-    return grade;
-}
-
 void move(int &x, int &y, vector<spot> &temp) 
 {
     //move around, start from x,y
+    // 右左下上
     int tempx = x;
     int tempy = y;
     while(nowstep < e){
-        /*
-        bool flag = false;
-        for(int i = 0; i < 4; i ++){
-            tempx = x + dirx[i];
-            tempy = y + diry[i];
-            if(outbound(tempx,tempy)) continue; 
-            if(!map_clean[tempx][tempy] && nowstep + vis[tempx][tempy] < e ){
-                x = tempx;
-                y = tempy;
-                map_clean[x][y] = true;
-                temp.push_back(spot(x,y));
-                nowstep++;
-                flag = true;
-                break;
-            }
-        }
-        if(!flag) return;*/
-
-        if(y+1<n && nowstep+vis[x][y+1]<e && !map_clean[x][y+1] ) y ++;
-        else if(y-1>=0 && nowstep+vis[x][y-1]<e && !map_clean[x][y-1] ) y --;
-        else if(x+1<m && nowstep+vis[x+1][y]<e  && !map_clean[x+1][y] ) x ++;
-        else if(x-1>=0 && nowstep+vis[x-1][y]<e && !map_clean[x-1][y] ) x --;
-        else if(y+1<n && nowstep+vis[x][y+1]<e ) y ++;
-        else if(y-1>=0 && nowstep+vis[x][y-1]<e ) y --;
-        else if(x+1<m && nowstep+vis[x+1][y]<e ) x ++;
-        else if(x-1>=0 && nowstep+vis[x-1][y]<e ) x --;
+        if(y+1<n && nowstep+vis[x][y+1]<e && vis[x][y+1] != -1 && !map_clean[x][y+1] ) y ++;
+        else if(y-1>=0 && nowstep+vis[x][y-1]<e && vis[x][y-1] != -1 && !map_clean[x][y-1] ) y --;
+        else if(x+1<m && nowstep+vis[x+1][y]<e  && vis[x+1][y] != -1 && !map_clean[x+1][y] ) x ++;
+        else if(x-1>=0 && nowstep+vis[x-1][y]<e && vis[x-1][y] != -1 && !map_clean[x-1][y] ) x --;
         else return;
         map_clean[x][y] = true;
         temp.push_back(spot(x,y));
@@ -335,35 +257,6 @@ void charge(int &x, int &y, vector<spot> &temp)
     if(cost == 1) return;
     while(cost > 1){
         cost --;
-        /*
-        flag = false;
-        for(int i = 0; i < 4; i ++){
-            tempx = x + dirx[i];
-            tempy = y + diry[i];
-            if(outbound(tempx,tempy)) continue;
-            if(vis[tempx][tempy] == cost && !map_clean[tempx][tempy]) {
-                x = tempx;
-                y = tempy;
-                map_clean[x][y] = true;
-                temp.push_back(spot(x,y));
-                flag = true;
-                break;
-            }
-        }
-        
-        if(flag == true) continue;
-        for(int i = 0; i < 4; i ++){
-            tempx = x + dirx[i];
-            tempy = y + diry[i];
-            if(outbound(tempx,tempy)) continue;
-            if(vis[tempx][tempy] == cost) {
-                x = tempx;
-                y = tempy;
-                map_clean[x][y] = true;
-                temp.push_back(spot(x,y));
-                break;
-            }
-        }*/
         // 右左下上
         if(y+1<n && vis[x][y+1]==cost && !map_clean[x][y+1] ) y ++;
         else if(y-1>=0 && vis[x][y-1]==cost && !map_clean[x][y-1] ) y --;
