@@ -36,7 +36,7 @@ void _path(int &x, int &y, int cost);
 void move(int &x, int &y, vector<spot> &temp); //move around
 void charge(int &x, int &y, vector<spot> &temp); //go home
 void flush(vector<spot> &temp); //flush data into temp file
-bool bounce(int &x, int &y, vector<spot> &temp);
+bool bounce(int &x, int &y, vector<spot> &temp); //bounce one step to a smaller place
 // minor functions
 void debug_i(vector <vector<int> > a); //debugger for int
 void debug_b(vector <vector<bool> > a); //debugger for bool
@@ -96,7 +96,7 @@ int main(int argc, const char * argv[])
         }
     }
 
-    // output to final
+    // output result
     FILE* output = freopen("final.path","w",stdout);
     tempo = freopen("temp.txt","r",stdin);
     cout << "total: " << total << endl;
@@ -267,6 +267,7 @@ void charge(int &x, int &y, vector<spot> &temp)
                 break;
             }
         }
+        
         if(flag == true) continue;
         for(int i = 0; i < 4; i ++){
             tempx = x + dirx[i];
