@@ -51,7 +51,8 @@ void dfs(){
 		if(!dir[i].fi && path.size() != m * n - wall -1) continue;
 		int a = x + dx[dir[i].se], b = y + dy[dir[i].se];
 		if(a >= 1 && a <= m && b >= 1 && b <= n && !vis[a][b]){
-			path.push_back(mp(a, b)), vis[a][b] = true, dfs(); if(ok) return;
+			path.push_back(mp(a, b)), vis[a][b] = true, dfs(); 
+			if(ok) return;
 			path.pop_back(), vis[a][b] = false;
 		}	
 	}
