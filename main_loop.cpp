@@ -39,6 +39,17 @@ struct spot_{
     spot_(int a,int b):x(a),y(b),cost(0){}
     spot_(int a,int b,int c):x(a),y(b),cost(c){}
 };
+struct myCompare { 
+    bool operator()(spot_ const& p1, spot_ const& p2) 
+    { 
+        // return "true" if "p1" is ordered  
+        // before "p2", for example: 
+        return p1.cost < p2.cost; 
+        //return 0; 
+    } 
+}; 
+priority_queue<spot_, vector<spot_>, myCompare> PQ; 
+//queue<spot_, vector<spot_> > PQ; 
 
 // main functions
 void BFS(int x, int y,int cost, vector <vector<int> > &vis);
@@ -54,6 +65,7 @@ bool bounce(int &x, int &y, vector<spot> &temp); //bounce one step to a smaller 
 void debug_i(vector <vector<int> > a); //debugger for int
 void debug_b(vector <vector<bool> > a); //debugger for bool
 bool outbound(int x, int y); //true if it's outbound
+bool shape_u(int x, int y);
 
 time_t start;
 clock_t start_clock;
@@ -137,7 +149,12 @@ int main(int argc, const char * argv[])
     stop_clock = clock();
     duration_clock = ((double) (stop_clock-start_clock))/ CLOCKS_PER_SEC;
     cout << "time: " << duration  << "," << duration_clock << endl;
-    cout << "bfs time: "<< duration_temp << endl;
+    
+    while(!PQ.empty() ){
+        spot_ p = PQ.top();
+        PQ.pop();
+        cout << p.x << "," << p.y << " " << p.cost << endl;
+    }
     
     fclose(tempo);
     fclose(output);
@@ -159,10 +176,16 @@ void BFS(int x, int y,int cost, vector <vector<int> > &vis)
     vis[x][y] = 0; //此點為起點
 
     while(!q.empty()){
+
         spot temp = q.front();
         q.pop();
         int x0 = temp.x;
         int y0 = temp.y;
+        if(vis[x0][y0] == e/2){
+            PQ.push(spot_(x0,y0,vis[x0][y0]) );
+            continue;
+        }
+
         if(x0-1>=0 && !clean[x0-1][y0]){
             vis[x0-1][y0] = vis[x0][y0] +1;
             clean[x0-1][y0] = 1;
@@ -183,7 +206,9 @@ void BFS(int x, int y,int cost, vector <vector<int> > &vis)
             clean[x0][y0-1] = 1;
             q.push(spot(x0,y0-1));
         }
-
+        if(shape_u(x0,y0) || vis[x0][y0]==e/2 ){
+            PQ.push(spot_(x0,y0,vis[x0][y0]) );
+        }
     }
     return;
 }
@@ -333,4 +358,19 @@ void debug_b(vector <vector<bool> > a)
         }
         cout << endl;
     }
+}
+bool shape_u(int x, int y)
+{
+    int counter = 0;
+    int dir = -1;
+    for(int i = 0; i < 4; i ++){
+        if(counter > 1) return false;
+        if(outbound(x+dx[i],y+dy[i]) ) continue;
+        if(!map[x+dx[i]][y+dy[i]] ){
+            counter++;
+            dir = i;
+        }
+    }
+    if(counter != 1) return false;
+    return true;
 }

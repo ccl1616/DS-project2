@@ -24,7 +24,7 @@ struct spot_{
     spot_(int a,int b):x(a),y(b),cost(0){}
     spot_(int a,int b,int c):x(a),y(b),cost(c){}
 };
-struct CompareHeight { 
+struct myCompare { 
     bool operator()(spot_ const& p1, spot_ const& p2) 
     { 
         // return "true" if "p1" is ordered  
@@ -37,7 +37,7 @@ struct CompareHeight {
 
 int main()
 {
-    priority_queue<spot_, vector<spot_>, CompareHeight> Q; 
+    priority_queue<spot_, vector<spot_>, myCompare> Q; 
   
     // When we use priority_queue with  structure 
     // then we need this kind of syntax where 
