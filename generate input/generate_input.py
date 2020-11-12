@@ -1,5 +1,5 @@
-m = 100
-n = 100
+m = 10
+n = 10
 b = (m+n-2)*2
 input_file_name = f'{m}x{n}.txt'
 
