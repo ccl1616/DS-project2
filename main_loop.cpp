@@ -31,6 +31,14 @@ struct spot{
     spot(){}
     spot(int a,int b):x(a),y(b){}
 };
+struct spot_{
+    short x;
+    short y;
+    int cost;
+    spot_(){}
+    spot_(int a,int b):x(a),y(b),cost(0){}
+    spot_(int a,int b,int c):x(a),y(b),cost(c){}
+};
 
 // main functions
 void BFS(int x, int y,int cost, vector <vector<int> > &vis);
@@ -56,6 +64,7 @@ double duration_clock;
 
 int main(int argc, const char * argv[])
 {
+    if(argc != 2) exit(1);
     start = time(NULL);
     start_clock = clock();
 
@@ -129,14 +138,7 @@ int main(int argc, const char * argv[])
     duration_clock = ((double) (stop_clock-start_clock))/ CLOCKS_PER_SEC;
     cout << "time: " << duration  << "," << duration_clock << endl;
     cout << "bfs time: "<< duration_temp << endl;
-    /*
-    cout << "map\n";
-    debug_b(map);
-    cout << "map_clean\n";
-    debug_b(map_clean);
-    cout << "vis\n";
-    debug_i(vis);*/
-
+    
     fclose(tempo);
     fclose(output);
     return 0;
@@ -191,10 +193,10 @@ void combine(int x, int y, vector<spot> &temp,FILE* tempo)
     path(x,y,temp);
     nowstep = vis[x][y];
     move(x,y,temp);
-    /*
+    
     while(bounce(x,y,temp)){
         move(x,y,temp);
-    }*/
+    }
     charge(x,y,temp);
     flush(temp,tempo);
 }

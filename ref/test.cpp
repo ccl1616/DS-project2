@@ -9,9 +9,6 @@
 #include <algorithm>
 #include <array>
 using namespace std;
-
-typedef pair<int, int> pii;
-
 struct spot{
     short x;
     short y;
@@ -19,32 +16,40 @@ struct spot{
     spot(int a,int b):x(a),y(b){}
 };
 
-struct edge{
-    spot p;
-    int grade;
-    edge(){}
-    edge(int a,int b, int c):p( spot(a,b)),grade(c) {}
+struct spot_{
+    short x;
+    short y;
+    int cost;
+    spot_(){}
+    spot_(int a,int b):x(a),y(b),cost(0){}
+    spot_(int a,int b,int c):x(a),y(b),cost(c){}
 };
+struct CompareHeight { 
+    bool operator()(spot_ const& p1, spot_ const& p2) 
+    { 
+        // return "true" if "p1" is ordered  
+        // before "p2", for example: 
+        return p1.cost < p2.cost; 
+    } 
+}; 
 
-bool compare(edge a, edge b)
-{
-	return a.grade > b.grade;
-}
+
 
 int main()
 {
-    edge arr[10];
-    int temp[10] = {2,5,1,3,4, 9,6,8,100,100};
-    for(int i = 0; i < 5; i ++){
-        arr[i] = edge(0,i,temp[i]);
-    }
-    for(int i = 6; i < 9; i ++){
-        arr[i] = edge(0,i,temp[i]);
-    }
-    sort(arr,arr+10,compare);
-    for(int i = 0; i < 10; i ++){
-        cout << arr[i].p.x << "," << arr[i].p.y << " " << arr[i].grade << endl;
-    }
+    priority_queue<spot_, vector<spot_>, CompareHeight> Q; 
+  
+    // When we use priority_queue with  structure 
+    // then we need this kind of syntax where 
+    // CompareAge is the functor or comparison function 
+    vector<spot_> arr;
+    for(int i = 0; i < 10; i ++)
+        Q.push(spot_(i,i,10-i) );
 
-    return 0;
+    while (!Q.empty()) { 
+        spot_ p = Q.top(); 
+        Q.pop(); 
+        cout << p.x << "," << p.y << " " << p.cost << endl;
+    } 
+    return 0; 
 }

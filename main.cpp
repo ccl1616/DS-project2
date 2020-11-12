@@ -114,13 +114,6 @@ int main(int argc, const char * argv[])
     double duration_clock = ((double) (stop_clock-start_clock))/ CLOCKS_PER_SEC;
     cout << "time: " << duration  << "," << duration_clock << endl;
 
-    cout << "map\n";
-    debug_b(map);
-    cout << "map_clean\n";
-    debug_b(map_clean);
-    cout << "vis\n";
-    debug_i(vis);
-
     fclose(tempo);
     fclose(output);
     return 0;
@@ -310,8 +303,8 @@ bool bounce(int &x, int &y, vector<spot> &temp)
 void flush(vector<spot> &temp,FILE* tempo)
 {
     for(int i = 0; i < temp.size(); i ++) 
-        cout << temp[i].x << " " << temp[i].y << endl;
-    cout << R_x << " " << R_y << endl;
+        fprintf(tempo,"%d %d\n",temp[i].x,temp[i].y);
+    fprintf(tempo,"%d %d\n",R_x,R_y);
     total += temp.size()+1;
     temp.clear();
 }
