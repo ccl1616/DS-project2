@@ -30,12 +30,12 @@ struct spot{
 
 // main functions
 void BFS(int x, int y,int cost, vector <vector<int> > &vis);
-void combine(int x, int y, vector<spot> &temp); //path + move + charge
+void combine(int x, int y, vector<spot> &temp,FILE* tempo); //path + move + charge
 void path(int x, int y, vector<spot> &temp); //R to spot
 void _path(int &x, int &y, int cost);
 void move(int &x, int &y, vector<spot> &temp); //move around
 void charge(int &x, int &y, vector<spot> &temp); //go home
-void flush(vector<spot> &temp); //flush data into temp file
+void flush(vector<spot> &temp,FILE* tempo); //flush data into temp file
 bool bounce(int &x, int &y, vector<spot> &temp); //bounce one step to a smaller place
 // minor functions
 void debug_i(vector <vector<int> > a); //debugger for int
@@ -91,7 +91,7 @@ int main(int argc, const char * argv[])
     for(int i = 0; i < m; i ++){
         for(int j = 0; j < n; j ++){
             if(!map_clean[i][j]){
-                combine(i,j,temp);
+                combine(i,j,temp,tempo);
             }
         }
     }
@@ -158,7 +158,7 @@ void BFS(int x, int y,int cost, vector <vector<int> > &vis)
     return;
 }
 
-void combine(int x, int y, vector<spot> &temp)
+void combine(int x, int y, vector<spot> &temp,FILE* tempo)
 {
     //cout << "before path: " << x << " " << y << endl;
     path(x,y,temp);
@@ -170,7 +170,7 @@ void combine(int x, int y, vector<spot> &temp)
     }
     //cout << "before charge: " << x << " " << y << endl;
     charge(x,y,temp);
-    flush(temp);
+    flush(temp,tempo);
 }
 
 void path(int x, int y, vector<spot> &temp){
@@ -307,7 +307,7 @@ bool bounce(int &x, int &y, vector<spot> &temp)
 }
 
 // minor functions
-void flush(vector<spot> &temp)
+void flush(vector<spot> &temp,FILE* tempo)
 {
     for(int i = 0; i < temp.size(); i ++) 
         cout << temp[i].x << " " << temp[i].y << endl;
