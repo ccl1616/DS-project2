@@ -49,6 +49,8 @@ struct myCompare {
     } 
 }; 
 priority_queue<spot_, vector<spot_>, myCompare> PQ; 
+stack<spot_> biggest;
+int big = -1;
 //queue<spot_, vector<spot_> > PQ; 
 
 // main functions
@@ -159,6 +161,7 @@ int main(int argc, const char * argv[])
     duration_clock = ((double) (stop_clock-start_clock))/ CLOCKS_PER_SEC;
     cout << "time: " << duration  << "," << duration_clock << endl;
     
+    cout << PQ.empty() << endl;
     while(!PQ.empty() ){
         spot_ p = PQ.top();
         PQ.pop();
@@ -194,6 +197,10 @@ void BFS(int x, int y,int cost, vector <vector<int> > &vis)
             PQ.push(spot_(x0,y0,vis[x0][y0]) );
             continue;
         }
+        if(vis[x0][y0] > big){
+            big = vis[x0][y0];
+            biggest.push(spot_(x0,y0,vis[x0][y0]));
+        }
 
         if(x0-1>=0 && !clean[x0-1][y0]){
             vis[x0-1][y0] = vis[x0][y0] +1;
@@ -215,8 +222,16 @@ void BFS(int x, int y,int cost, vector <vector<int> > &vis)
             clean[x0][y0-1] = 1;
             q.push(spot(x0,y0-1));
         }
+
         if(shape_u(x0,y0) || vis[x0][y0]==e/2 ){
             PQ.push(spot_(x0,y0,vis[x0][y0]) );
+        }
+    }
+    while(!biggest.empty()){
+        spot_ p = biggest.top();
+        biggest.pop();
+        if(p.cost == big){
+            PQ.push(spot_(p.x,p.y,p.cost) );
         }
     }
     return;
@@ -226,8 +241,8 @@ void combine(int x, int y, vector<spot> &temp,FILE* tempo)
 {
     path(x,y,temp);
     nowstep = vis[x][y];
+    //flush(temp,tempo);
     move(x,y,temp);
-    
     while(bounce(x,y,temp)){
         move(x,y,temp);
     }
@@ -288,8 +303,6 @@ void move(int &x, int &y, vector<spot> &temp)
 void charge(int &x, int &y, vector<spot> &temp) 
 {
     //go home 遞減走回家  
-    x = temp.back().x;
-    y = temp.back().y;
     int cost = vis[x][y];
     if(cost == 1) return;
     while(cost > 1){
