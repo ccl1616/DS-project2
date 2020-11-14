@@ -375,7 +375,6 @@ bool _4move(int &x, int &y){
 void move(int &x, int &y, vector<spot> &temp) 
 {
     //move around, start from x,y
-    /*
     while(nowstep < e){
         bool f = false;
         if( _1move(x,y) ){
@@ -390,29 +389,19 @@ void move(int &x, int &y, vector<spot> &temp)
             nowstep++;
             f = true;
         }
-        if( _3move(x,y) ){
+        if( _2move(x,y) ){
             map_clean[x][y] = true;
             temp.push_back(spot(x,y));
             nowstep++;
             f = true;
         }
-        if( _4move(x,y) ){
+        if( _2move(x,y) ){
             map_clean[x][y] = true;
             temp.push_back(spot(x,y));
             nowstep++;
             f = true;
         }
         if(!f) return;
-    }*/
-    while(nowstep < e){
-        if(y+1<n && nowstep+vis[x][y+1]<e && vis[x][y+1] != -1 && !map_clean[x][y+1] ) y ++;
-        else if(y-1>=0 && nowstep+vis[x][y-1]<e && vis[x][y-1] != -1 && !map_clean[x][y-1] ) y --;
-        else if(x+1<m && nowstep+vis[x+1][y]<e  && vis[x+1][y] != -1 && !map_clean[x+1][y] ) x ++;
-        else if(x-1>=0 && nowstep+vis[x-1][y]<e && vis[x-1][y] != -1 && !map_clean[x-1][y] ) x --;
-        else return;
-        map_clean[x][y] = true;
-        temp.push_back(spot(x,y));
-        nowstep++;
     }
 }
 void charge(int &x, int &y, vector<spot> &temp) 

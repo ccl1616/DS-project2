@@ -125,14 +125,14 @@ int main(int argc, const char * argv[])
     double duration_temp = ((double) (stop_clock-start_clock))/ CLOCKS_PER_SEC;
 
     cout << R_x << " " << R_y << endl;
-    /*
+    
     while(!PQ.empty()){
         spot_ p = PQ.top();
         PQ.pop();
         if(!map_clean[p.x][p.y]){
             combine(p.x,p.y,temp,tempo);
         }
-    }*/
+    }
 
     for(int i = 0; i < m; i ++){
         for(int j = 0; j < n; j ++){
@@ -258,7 +258,6 @@ void path(int x, int y, vector<spot> &temp){
     while(cost > 1){
         cost--;
         _path(x,y,cost);
-        //_path_wall(x,y,cost);
         s.push(spot(x,y));
         map_clean[x][y] = true;
     }
