@@ -65,10 +65,10 @@ void _1path(int &x, int &y, int cost);
 void _2path(int &x, int &y, int cost);
 void _3path(int &x, int &y, int cost);
 void _4path(int &x, int &y, int cost);
-bool _1move(int &x, int &y, int cost);
-bool _2move(int &x, int &y, int cost);
-bool _3move(int &x, int &y, int cost);
-bool _4move(int &x, int &y, int cost);
+bool _1move(int &x, int &y);
+bool _2move(int &x, int &y);
+bool _3move(int &x, int &y);
+bool _4move(int &x, int &y);
 
 // minor functions
 void debug_i(vector <vector<int> > a); //debugger for int
@@ -129,18 +129,21 @@ int main(int argc, const char * argv[])
     FILE *tempo = freopen("temp.txt","w",stdout);
     vector<spot> temp;
     BFS(R_x,R_y,0,vis);
-    stop_clock = clock();
-    double duration_temp = ((double) (stop_clock-start_clock))/ CLOCKS_PER_SEC;
+    for(int i = 0; i < m; i ++){
+        for(int j = 0; j < n; j ++){
+            if(vis[i][j] == big) PQ.push(spot_(i,j,vis[i][j]) );
+        }
+    }
 
     cout << R_x << " " << R_y << endl;
-    /*
+    
     while(!PQ.empty()){
         spot_ p = PQ.top();
         PQ.pop();
         if(!map_clean[p.x][p.y]){
             combine(p.x,p.y,temp,tempo);
         }
-    }*/
+    }
 
     for(int i = 0; i < m; i ++){
         for(int j = 0; j < n; j ++){
@@ -174,7 +177,7 @@ int main(int argc, const char * argv[])
         PQ.pop();
         cout << p.x << "," << p.y << " " << p.cost << endl;
     }
-    debug_i(vis);
+    //debug_i(vis);
     
     fclose(tempo);
     fclose(output);
@@ -194,20 +197,18 @@ void BFS(int x, int y,int cost, vector <vector<int> > &vis)
     queue<spot> q;
     q.push(spot(x,y));
     vis[x][y] = 0; //此點為起點
-    
+
     while(!q.empty()){
 
         spot temp = q.front();
         q.pop();
         int x0 = temp.x;
         int y0 = temp.y;
-        if(vis[x0][y0] == e/2){
+        if(shape_u(x0,y0) || vis[x0][y0] == e/2){
             PQ.push(spot_(x0,y0,vis[x0][y0]) );
-            continue;
         }
         if(vis[x0][y0] > big){
             big = vis[x0][y0];
-            biggest.push(spot_(x0,y0,vis[x0][y0]));
         }
 
         if(x0-1>=0 && !clean[x0-1][y0]){
@@ -229,17 +230,6 @@ void BFS(int x, int y,int cost, vector <vector<int> > &vis)
             vis[x0][y0-1] = vis[x0][y0] +1;
             clean[x0][y0-1] = 1;
             q.push(spot(x0,y0-1));
-        }
-
-        if(shape_u(x0,y0) || vis[x0][y0]==e/2 ){
-            PQ.push(spot_(x0,y0,vis[x0][y0]) );
-        }
-    }
-    while(!biggest.empty()){
-        spot_ p = biggest.top();
-        biggest.pop();
-        if(p.cost == big){
-            PQ.push(spot_(p.x,p.y,p.cost) );
         }
     }
     return;
@@ -385,21 +375,33 @@ bool _4move(int &x, int &y){
 void move(int &x, int &y, vector<spot> &temp) 
 {
     //move around, start from x,y
-    // 右左下上
     while(nowstep < e){
         bool f = false;
-        if(x <= R_x){
-            if( y <= R_y) f = _2move(x,y);
-            else f = _1move(x,y);
+        if( _1move(x,y) ){
+            map_clean[x][y] = true;
+            temp.push_back(spot(x,y));
+            nowstep++;
+            f = true;
         }
-        else{
-            if( y <= R_y) f = _3move(x,y);
-            else f = _4move(x,y);
+        if( _2move(x,y) ){
+            map_clean[x][y] = true;
+            temp.push_back(spot(x,y));
+            nowstep++;
+            f = true;
+        }
+        if( _2move(x,y) ){
+            map_clean[x][y] = true;
+            temp.push_back(spot(x,y));
+            nowstep++;
+            f = true;
+        }
+        if( _2move(x,y) ){
+            map_clean[x][y] = true;
+            temp.push_back(spot(x,y));
+            nowstep++;
+            f = true;
         }
         if(!f) return;
-        map_clean[x][y] = true;
-        temp.push_back(spot(x,y));
-        nowstep++;
     }
 }
 void charge(int &x, int &y, vector<spot> &temp) 
