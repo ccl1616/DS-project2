@@ -45,7 +45,6 @@ struct myCompare {
         // return "true" if "p1" is ordered  
         // before "p2", for example: 
         return p1.cost < p2.cost; 
-        //return 0; 
     } 
 }; 
 priority_queue<spot_, vector<spot_>, myCompare> PQ; 
@@ -126,14 +125,14 @@ int main(int argc, const char * argv[])
     double duration_temp = ((double) (stop_clock-start_clock))/ CLOCKS_PER_SEC;
 
     cout << R_x << " " << R_y << endl;
-    
+    /*
     while(!PQ.empty()){
         spot_ p = PQ.top();
         PQ.pop();
         if(!map_clean[p.x][p.y]){
             combine(p.x,p.y,temp,tempo);
         }
-    }
+    }*/
 
     for(int i = 0; i < m; i ++){
         for(int j = 0; j < n; j ++){
