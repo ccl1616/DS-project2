@@ -248,6 +248,7 @@ void combine(int x, int y, vector<spot> &temp,FILE* tempo)
         move(x,y,temp);
     }
     charge(x,y,temp);
+    temp.push_back(spot(R_x,R_y));
     flush(temp,tempo);
 }
 
@@ -324,7 +325,6 @@ void charge(int &x, int &y, vector<spot> &temp)
         map_clean[x][y] = true;
         temp.push_back(spot(x,y));
     }
-    temp.push_back(spot(R_x,R_y));
 }
 
 bool bounce(int &x, int &y, vector<spot> &temp)
