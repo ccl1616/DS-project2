@@ -124,15 +124,15 @@ int main(int argc, const char * argv[])
     stop_clock = clock();
     double duration_temp = ((double) (stop_clock-start_clock))/ CLOCKS_PER_SEC;
 
-    cout << R_x << " " << R_y << endl;
-    
+    //cout << R_x << " " << R_y << endl;
+    /*
     while(!PQ.empty()){
         spot_ p = PQ.top();
         PQ.pop();
         if(!map_clean[p.x][p.y]){
             combine(p.x,p.y,temp,tempo);
         }
-    }
+    }*/
 
     for(int i = 0; i < m; i ++){
         for(int j = 0; j < n; j ++){
@@ -145,15 +145,17 @@ int main(int argc, const char * argv[])
     // output result
     FILE* output = freopen("final.path","w",stdout);
     tempo = freopen("temp.txt","r",stdin);
-    cout << "total: " << total << endl;
-    /*
+    //cout << "total: " 
+    cout << total << endl;
+    
     int a = 0;
     int b = 0; 
     for(int i = 0; i < total; i ++){
         fscanf(tempo,"%d %d",&a,&b);
         fprintf(output,"%d %d\n",a,b);
-    }*/
+    }
 
+    /*
     stop = time(NULL);
     duration = (double) difftime(stop,start);
     stop_clock = clock();
@@ -165,7 +167,7 @@ int main(int argc, const char * argv[])
         spot_ p = PQ.top();
         PQ.pop();
         cout << p.x << "," << p.y << " " << p.cost << endl;
-    }
+    }*/
     
     fclose(tempo);
     fclose(output);
@@ -222,7 +224,7 @@ void BFS(int x, int y,int cost, vector <vector<int> > &vis)
             q.push(spot(x0,y0-1));
         }
 
-        if(shape_u(x0,y0) || vis[x0][y0]==e/2 ){
+        if(shape_u(x0,y0) ){
             PQ.push(spot_(x0,y0,vis[x0][y0]) );
         }
     }

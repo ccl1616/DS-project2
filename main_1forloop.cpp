@@ -11,12 +11,6 @@ using namespace std;
 vector <vector<bool> > map; //for input
 vector <vector<bool> > map_clean; //for now situation
 vector <vector<int> > vis;
-// 上下左右
-int dx[4] = {-1,1,0,0};
-int dy[4] = {0,0,-1,1};
-// 右左下上
-int dirx[4] = {0,0,1,-1};
-int diry[4] = {1,-1,0,0};
 int m,n,e,R_x,R_y;
 int total;
 int nowstep;
@@ -128,7 +122,9 @@ void BFS(int x, int y,int cost, vector <vector<int> > &vis)
             clean[i][j] = map[i][j];
         }
     }
-    // x,y for starting pos
+    // 上下左右
+    int dx[4] = {-1,1,0,0};
+    int dy[4] = {0,0,-1,1};
     queue<spot> q;
     q.push(spot(x,y));
     vis[x][y] = 0; //此點為起點
@@ -153,15 +149,12 @@ void BFS(int x, int y,int cost, vector <vector<int> > &vis)
 
 void combine(int x, int y, vector<spot> &temp,FILE* tempo)
 {
-    //cout << "before path: " << x << " " << y << endl;
     path(x,y,temp);
     nowstep = vis[x][y];
     move(x,y,temp);
-    //cout << "after move: " << x << " " << y << endl;
     while(bounce(x,y,temp)){
         move(x,y,temp);
     }
-    //cout << "before charge: " << x << " " << y << endl;
     charge(x,y,temp);
     flush(temp,tempo);
 }
@@ -215,6 +208,9 @@ void _path(int &x, int &y, int cost )
 void move(int &x, int &y, vector<spot> &temp) 
 {
     //move around, start from x,y
+    // 右左下上
+    int dirx[4] = {0,0,1,-1};
+    int diry[4] = {1,-1,0,0};
     int tempx = x;
     int tempy = y;
     while(nowstep < e){
@@ -223,7 +219,7 @@ void move(int &x, int &y, vector<spot> &temp)
             tempx = x + dirx[i];
             tempy = y + diry[i];
             if(outbound(tempx,tempy)) continue; 
-            if(!map_clean[tempx][tempy] && nowstep + vis[tempx][tempy] < e ){
+            if(!map_clean[tempx][tempy] && nowstep+vis[tempx][tempy] < e ){
                 x = tempx;
                 y = tempy;
                 map_clean[x][y] = true;
@@ -239,6 +235,9 @@ void move(int &x, int &y, vector<spot> &temp)
 void charge(int &x, int &y, vector<spot> &temp) 
 {
     //go home 遞減走回家  
+    // 右左下上
+    int dirx[4] = {0,0,1,-1};
+    int diry[4] = {1,-1,0,0};
     int cost = vis[x][y];
     int tempx = x;
     int tempy = y;
@@ -274,7 +273,7 @@ void charge(int &x, int &y, vector<spot> &temp)
                 break;
             }
         }
-    }
+    } // end of while
 }
 
 bool bounce(int &x, int &y, vector<spot> &temp)
@@ -289,13 +288,11 @@ bool bounce(int &x, int &y, vector<spot> &temp)
             cout << vis[x_][y_] << " " << e << endl;
             return false;
         }
-        //cout << "bounce from: " << x << "," << y << " to " << x_ << "," << y_ << endl;
         x = x_, y = y_;
         temp.push_back(spot(x,y));
         nowstep++;
         return true;
     }
-    //cout << "bounce false from: " << x << "," << y << " to " << x_ << "," << y_ << endl;
     return false;
 }
 
