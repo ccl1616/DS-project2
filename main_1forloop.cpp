@@ -93,20 +93,20 @@ int main(int argc, const char * argv[])
     // output result
     FILE* output = freopen("final.path","w",stdout);
     tempo = freopen("temp.txt","r",stdin);
-    cout << "total: " << total << endl;
-    /*
+    cout << total << endl;
+    
     int a = 0;
     int b = 0; 
-    for(int i = 0; i < total; i ++){
+    for(int i = 0; i < total+1; i ++){
         fscanf(tempo,"%d %d",&a,&b);
         fprintf(output,"%d %d\n",a,b);
-    }*/
+    }
 
     time_t stop = time(NULL);
     double duration = (double) difftime(stop,start);
     clock_t stop_clock = clock();
     double duration_clock = ((double) (stop_clock-start_clock))/ CLOCKS_PER_SEC;
-    cout << "time: " << duration  << "," << duration_clock << endl;
+    //cout << "time: " << duration  << "," << duration_clock << endl;
 
     fclose(tempo);
     fclose(output);
@@ -274,6 +274,7 @@ void charge(int &x, int &y, vector<spot> &temp)
             }
         }
     } // end of while
+    temp.push_back(spot(R_x,R_y));
 }
 
 bool bounce(int &x, int &y, vector<spot> &temp)
@@ -301,8 +302,8 @@ void flush(vector<spot> &temp,FILE* tempo)
 {
     for(int i = 0; i < temp.size(); i ++) 
         fprintf(tempo,"%d %d\n",temp[i].x,temp[i].y);
-    fprintf(tempo,"%d %d\n",R_x,R_y);
-    total += temp.size()+1;
+    //fprintf(tempo,"%d %d\n",R_x,R_y);
+    total += temp.size();
     temp.clear();
 }
 bool outbound(int x, int y)
