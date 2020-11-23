@@ -121,18 +121,16 @@ int main(int argc, const char * argv[])
     FILE *tempo = freopen("temp.txt","w",stdout);
     vector<spot> temp;
     BFS(R_x,R_y,0,vis);
-    stop_clock = clock();
-    double duration_temp = ((double) (stop_clock-start_clock))/ CLOCKS_PER_SEC;
 
     cout << R_x << " " << R_y << endl;
-    /*
+    
     while(!PQ.empty()){
         spot_ p = PQ.top();
         PQ.pop();
         if(!map_clean[p.x][p.y]){
             combine(p.x,p.y,temp,tempo);
         }
-    }*/
+    }
 
     for(int i = 0; i < m; i ++){
         for(int j = 0; j < n; j ++){
@@ -145,7 +143,7 @@ int main(int argc, const char * argv[])
     // output result
     FILE* output = freopen("final.path","w",stdout);
     tempo = freopen("temp.txt","r",stdin);
-    //cout << "total: " 
+    
     cout << total << endl;
     
     int a = 0;
@@ -155,22 +153,22 @@ int main(int argc, const char * argv[])
         fprintf(output,"%d %d\n",a,b);
     }
 
-    /*
+    
     stop = time(NULL);
     duration = (double) difftime(stop,start);
     stop_clock = clock();
     duration_clock = ((double) (stop_clock-start_clock))/ CLOCKS_PER_SEC;
-    cout << "time: " << duration  << "," << duration_clock << endl;
-    
-    cout << PQ.empty() << endl;
-    while(!PQ.empty() ){
-        spot_ p = PQ.top();
-        PQ.pop();
-        cout << p.x << "," << p.y << " " << p.cost << endl;
-    }*/
     
     fclose(tempo);
     fclose(output);
+    /*
+    output = freopen("time.txt","w",stdout);
+    cout << "time: " << duration  << "," << duration_clock << endl;
+    while(!PQ.empty()){
+        spot_ p = PQ.top();
+        PQ.pop();
+        cout << p.x << " " << p.y << " " << p.cost << endl;
+    }*/
     return 0;
 }
 void BFS(int x, int y,int cost, vector <vector<int> > &vis)
@@ -194,13 +192,8 @@ void BFS(int x, int y,int cost, vector <vector<int> > &vis)
         q.pop();
         int x0 = temp.x;
         int y0 = temp.y;
-        if(vis[x0][y0] == e/2){
+        if(vis[x0][y0] > e/4 || shape_u(x0,y0)){
             PQ.push(spot_(x0,y0,vis[x0][y0]) );
-            continue;
-        }
-        if(vis[x0][y0] > big){
-            big = vis[x0][y0];
-            biggest.push(spot_(x0,y0,vis[x0][y0]));
         }
 
         if(x0-1>=0 && !clean[x0-1][y0]){
@@ -224,17 +217,8 @@ void BFS(int x, int y,int cost, vector <vector<int> > &vis)
             q.push(spot(x0,y0-1));
         }
 
-        if(shape_u(x0,y0) ){
-            PQ.push(spot_(x0,y0,vis[x0][y0]) );
-        }
     }
-    while(!biggest.empty()){
-        spot_ p = biggest.top();
-        biggest.pop();
-        if(p.cost == big){
-            PQ.push(spot_(p.x,p.y,p.cost) );
-        }
-    }
+    
     return;
 }
 
@@ -242,7 +226,6 @@ void combine(int x, int y, vector<spot> &temp,FILE* tempo)
 {
     path(x,y,temp);
     nowstep = vis[x][y];
-    //flush(temp,tempo);
     move(x,y,temp);
     while(bounce(x,y,temp)){
         move(x,y,temp);
@@ -272,14 +255,14 @@ void path(int x, int y, vector<spot> &temp){
 void _path(int &x, int &y, int cost )
 {
     // 下右上左
-    if( x+1<m && vis[x+1][y]==cost && !map_clean[x+1][y] ) x += 1;
-    else if( y+1<n && vis[x][y+1]==cost && !map_clean[x][y+1] ) y += 1;
-    else if( x-1>=0 && vis[x-1][y]==cost && !map_clean[x-1][y] ) x -= 1;
-    else if( y-1>=0 && vis[x][y-1]==cost && !map_clean[x][y-1] ) y -=1;
-    else if( x+1<m && vis[x+1][y]==cost ) x += 1;
-    else if( y+1<n && vis[x][y+1]==cost  ) y += 1;
-    else if( x-1>=0 && vis[x-1][y]==cost  ) x -= 1;
-    else if( y-1>=0 && vis[x][y-1]==cost  ) y -=1;
+    if( x+1<m && vis[x+1][y]==cost && !map_clean[x+1][y] ) x ++;
+    else if( y+1<n && vis[x][y+1]==cost && !map_clean[x][y+1] ) y ++;
+    else if( x-1>=0 && vis[x-1][y]==cost && !map_clean[x-1][y] ) x --;
+    else if( y-1>=0 && vis[x][y-1]==cost && !map_clean[x][y-1] ) y --;
+    else if( x+1<m && vis[x+1][y]==cost ) x ++;
+    else if( y+1<n && vis[x][y+1]==cost  ) y ++;
+    else if( x-1>=0 && vis[x-1][y]==cost  ) x --;
+    else if( y-1>=0 && vis[x][y-1]==cost  ) y --;
     else {
         cout << "impossible\n";
         exit(1);
@@ -339,13 +322,11 @@ bool bounce(int &x, int &y, vector<spot> &temp)
             cout << vis[x_][y_] << " " << e << endl;
             return false;
         }
-        //cout << "bounce from: " << x << "," << y << " to " << x_ << "," << y_ << endl;
         x = x_, y = y_;
         temp.push_back(spot(x,y));
         nowstep++;
         return true;
     }
-    //cout << "bounce false from: " << x << "," << y << " to " << x_ << "," << y_ << endl;
     return false;
 }
 
