@@ -370,7 +370,7 @@ bool shape_u(int x, int y)
     for(int i = 0; i < 4; i ++){
         if(counter > 1) return false;
         if(outbound(x+dx[i],y+dy[i]) ) continue;
-        if(!map[x+dx[i]][y+dy[i]] ){
+        if(!map[x+dx[i]][y+dy[i]] && (x+dx[i]!=R_x) && (y+dy[i]!=R_y) ){
             counter++;
             dir = i;
         }
